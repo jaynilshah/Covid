@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 const _ = require('lodash');
 const bcrypt = require('bcryptjs');
 
-var UserSchema = new mongoose.Schema({
+var DoctorSchema = new mongoose.Schema({
     email: {
         type: String,
         required: true,
@@ -16,25 +16,6 @@ var UserSchema = new mongoose.Schema({
             message: '{VALUE} is not a valid email'
         }
     },
-    state : {
-        type : String,
-        required : true,
-    },
-    active: {
-        type: Boolean,
-        default : false,
-    },
-    recovered: {
-        type: Boolean,
-        default : false,
-    },
-    deceased: {
-        type: Boolean,
-        default : false,
-    },
-    symptoms: [{
-        type: String
-    }],
     password: {
         type: String,
         require: true,
@@ -50,46 +31,34 @@ var UserSchema = new mongoose.Schema({
             required: true
         }
     }]
+
 }
+
 );
 
-UserSchema.methods.toJSON = function() {
+DoctorSchema.methods.toJSON = function() {
     var user = this;
     var userObject = user.toObject();
     return _.pick(userObject,['_id','email']);
 
 };
 
-UserSchema.methods.changeState = function(state) {
-    var user = this;
-    this.active = state;
-    return user.save().then(()=>{
-        return user;
-    });
-};
 
-UserSchema.methods.addSymptoms = function(symptoms) {
-    var user = this;
-    user.symptoms = user.symptoms.concat(symptoms);
-    return user.save().then(()=>{
-        return user;
-    });
-};
 
-UserSchema.methods.generateAuthToken = function (){
+DoctorSchema.methods.generateAuthToken = function (){
     var user = this;
     var access = 'auth';
     var token = jwt.sign({_id: user._id.toHexString(),access },"SecretKey").toString();
     
     user.tokens = user.tokens.concat([{access,token}]);
-
+    console.log(token);
     return user.save().then(()=>{
         return token;
     });
 };
 
 
-UserSchema.methods.removeToken = function(token){
+DoctorSchema.methods.removeToken = function(token){
     var user = this;
 
     return user.update({
@@ -99,7 +68,7 @@ UserSchema.methods.removeToken = function(token){
     })
 }
 
-UserSchema.statics.findByToken = function(token) {
+DoctorSchema.statics.findByToken = function(token) {
     var User = this;
     var decoded;
 
@@ -122,7 +91,7 @@ UserSchema.statics.findByToken = function(token) {
     });
 };
 
-UserSchema.statics.findByCredentials = function(email,password){
+DoctorSchema.statics.findByCredentials = function(email,password){
     var User = this;
     
     return User.findOne({email}).then((user)=>{
@@ -144,7 +113,7 @@ UserSchema.statics.findByCredentials = function(email,password){
     });
 }
 
-UserSchema.pre('save',function (next){
+DoctorSchema.pre('save',function (next){
     var user = this;
     if(user.isModified('password')){
         bcrypt.genSalt(10,(err,salt)=>{
@@ -159,8 +128,8 @@ UserSchema.pre('save',function (next){
     }   
 });
 
-var User = mongoose.model('user',UserSchema);
+var Doctor = mongoose.model('doctor',DoctorSchema);
 
 module.exports = {
-    User
+    Doctor
 }
