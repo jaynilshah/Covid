@@ -9,6 +9,11 @@ const cors = require('cors');
 const port = 3000;
 var app = express();
 app.use(cors());
+app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*"); // update to match the domain you will make the request from
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+  });
 app.use(express.static('./public'));
 app.use(bodyParser.json());
 app.listen(port,()=>{
@@ -48,12 +53,23 @@ app.post('/doctors',(req,res)=>{
 
 
 //login
-app.post('/users/login',(req,res)=>{
+app.post('/usersLogin',(req,res)=>{
     var body = _.pick(req.body,['email','password']);
     
     User.findByCredentials(body.email,body.password).then((user)=>{
         return user.generateAuthToken().then((token)=>{
             res.header('x-auth',token).send(user);
+        })
+    })
+    .catch((e)=>{
+        res.status(400).send(e);
+    });    
+})
+app.post('/doctorsLogin',(req,res)=>{
+    var body = _.pick(req.body,['email','password']);
+    Doctor.findByCredentials(body.email,body.password).then((user)=>{
+        return user.generateAuthToken().then((token)=>{
+            res.send({token,email:user.email});
         })
     })
     .catch((e)=>{
@@ -70,6 +86,12 @@ app.get('/temporary',(req,res)=>{
 })
 
 //logout
+app.delete('/users/me/token',authenticate,(req,res)=>{
+    req.user.removeToken(req.token).then(()=>{
+        res.status(200).send();
+    }).catch((e)=>res.status(400));
+})
+
 app.delete('/users/me/token',authenticate,(req,res)=>{
     req.user.removeToken(req.token).then(()=>{
         res.status(200).send();
