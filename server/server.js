@@ -78,8 +78,14 @@ app.post('/doctorsLogin',(req,res)=>{
     });    
 })
 //Homepage
-app.get('/users/me', authenticate , (req,res)=>{
-    res.send(req.user);
+app.get('/usersme', authenticate , (req,res)=>{
+    var cont = {'name' : req.user.name , 'symptoms' : req.user.symptoms, 'email' : req.user.email , 'state' : req.user.state, 'active': req.user.active, 'recovered' : req.user.recovered , 'deceased' : req.user.deceased }
+    res.send(cont);
+});
+
+app.get('/doctorsme', authenticate , (req,res)=>{
+    var cont = {'name' : req.user.name , 'email' : req.user.email }
+    res.send(cont);
 });
 
 app.get('/temporary',(req,res)=>{
