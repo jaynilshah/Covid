@@ -22,7 +22,8 @@ app.listen(port,()=>{
 
 app.post('/users',(req,res)=>{
     console.log('reg');
-    var body = _.pick(req.body, ['email','password']);
+    var body = _.pick(req.body, ['email','password','state','symptoms','name']);
+    
     var user = new User(body);
     user.save().then(()=>{
         return user.generateAuthToken();
@@ -33,6 +34,7 @@ app.post('/users',(req,res)=>{
         if(e)
         res.status(400).send(e);
     });
+    
 
 });
 
@@ -55,10 +57,9 @@ app.post('/doctors',(req,res)=>{
 //login
 app.post('/usersLogin',(req,res)=>{
     var body = _.pick(req.body,['email','password']);
-    
     User.findByCredentials(body.email,body.password).then((user)=>{
         return user.generateAuthToken().then((token)=>{
-            res.header('x-auth',token).send(user);
+            res.send({token,email:user.email,name: user.name});
         })
     })
     .catch((e)=>{
