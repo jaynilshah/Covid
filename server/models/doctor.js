@@ -16,6 +16,12 @@ var DoctorSchema = new mongoose.Schema({
             message: '{VALUE} is not a valid email'
         }
     },
+    name: {
+        type: String,
+        required: true,
+        minlength: 1,
+        trim: true
+    },
     password: {
         type: String,
         require: true,

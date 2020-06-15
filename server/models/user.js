@@ -16,6 +16,12 @@ var UserSchema = new mongoose.Schema({
             message: '{VALUE} is not a valid email'
         }
     },
+    name: {
+        type: String,
+        required: true,
+        minlength: 1,
+        trim: true
+    },
     state : {
         type : String,
         required : true,
@@ -32,12 +38,12 @@ var UserSchema = new mongoose.Schema({
         type: Boolean,
         default : false,
     },
-    symptoms: [{
+    symptoms: {
         type: String
-    }],
+    },
     password: {
         type: String,
-        require: true,
+        required: true,
         minlength: 6
     },
     tokens: [{

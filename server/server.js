@@ -37,7 +37,7 @@ app.post('/users',(req,res)=>{
 });
 
 app.post('/doctors',(req,res)=>{
-    var body = _.pick(req.body, ['email','password']);
+    var body = _.pick(req.body, ['email','password','name']);
     var doctor = new Doctor(body);
     doctor.save().then(()=>{
         return doctor.generateAuthToken();
@@ -69,7 +69,7 @@ app.post('/doctorsLogin',(req,res)=>{
     var body = _.pick(req.body,['email','password']);
     Doctor.findByCredentials(body.email,body.password).then((user)=>{
         return user.generateAuthToken().then((token)=>{
-            res.send({token,email:user.email});
+            res.send({token,email:user.email,name: user.name});
         })
     })
     .catch((e)=>{
