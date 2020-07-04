@@ -128,7 +128,7 @@ app.get('/stateList',(req,res)=>{
             else if(el.active){
                 x.active+= 1;
             }
-            else if(x.deceased){
+            else if(el.deceased){
                 x.deceased+=1;
             }
         });
