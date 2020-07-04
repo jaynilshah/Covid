@@ -68,7 +68,9 @@ UserSchema.methods.toJSON = function() {
 
 UserSchema.methods.changeState = function(state) {
     var user = this;
-    this.active = state;
+    this.active = state.active;
+    this.recovered = state.recovered;
+    this.deceased = state.deceased;
     return user.save().then(()=>{
         return user;
     });
@@ -147,6 +149,17 @@ UserSchema.statics.findByCredentials = function(email,password){
             })
 
         })
+    });
+}
+UserSchema.statics.findByEmail = function(email,password){
+    var User = this;
+    
+    return User.findOne({email}).then((user)=>{
+      
+        if(!user)
+            return Promise.reject('User not Found');
+        
+        return Promise.resolve(user);
     });
 }
 
