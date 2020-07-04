@@ -35,7 +35,6 @@ app.post('/users', (req, res) => {
             res.status(400).send(e);
     });
 
-
 });
 
 app.post('/doctors', (req, res) => {
@@ -112,9 +111,33 @@ app.get('/patientList', authenticate, (req, res) => {
         res.status(200).send(ans);
     })
         .catch((err) => {
-            res.status(404).send(e);
+            res.status(404).send(err);
         })
     
+})
+//StateList
+app.get('/stateList',(req,res)=>{
+    var map = stateMap();
+
+    User.find().then((users) => {
+        users.forEach(el => {
+            var x = map.get(`${el.state}`);
+            if(el.recovered){
+                x.recovered += 1;
+            }
+            else if(el.active){
+                x.active+= 1;
+            }
+            else if(x.deceased){
+                x.deceased+=1;
+            }
+        });
+        res.status(200).send([...map]);
+    })
+    .catch((err) => {
+        res.status(404).send(err);
+    })
+
 })
 
 //Homepage
@@ -144,3 +167,56 @@ app.delete('/users/me/token', authenticate, (req, res) => {
         res.status(200).send();
     }).catch((e) => res.status(400));
 })
+
+
+
+
+//Utility Function
+
+function stateMap(){
+    var states = [
+        { id:'1' , value: 'Andaman and Nicobar'},
+        { id:'2',    value : 'Andhra Pradesh'    },
+        { id:'3', value : 'Arunachal Pradesh' },
+        { id:'4', value : 'Assam' },
+        { id:'5', value : 'Bihar' },
+        { id:'6' , value: 'Chandigarh'},
+        { id:'7', value : 'Chhattisgarh' },
+        { id:'8' , value: 'Daman and Diu'},
+        { id:'9' , value: 'Dadar and Nagar Haveli'},
+        { id:'10' , value: 'Delhi'},
+        { id:'11', value : 'Goa' },
+        { id:'12', value : 'Gujarat' },
+        { id:'13', value : 'Haryana' },
+        { id:'14', value : 'Himachal Pradesh' },
+        { id:'15' , value: 'Jammu and Kashmir'},
+        { id:'16', value : 'Jharkhand' },
+        { id:'17', value : 'Karnataka' },
+        { id:'18', value : 'Kerala' },
+        { id:'19' , value: 'Ladakh'},
+        { id:'20' , value: 'Lakshadweep'},
+        { id:'21', value : 'Madhya Pradesh' },
+        { id:'22', value : 'Maharashtra' },
+        { id:'23', value : 'Manipur' },
+        { id:'24', value : 'Meghalaya' },
+        { id:'25', value : 'Mizoram' },
+        { id:'26', value : 'Nagaland' },
+        { id:'27', value : 'Odisha' },
+        { id:'28' , value: 'Puducherry'},
+        { id:'29', value : 'Punjab' },
+        { id:'30', value : 'Rajasthan' },
+        { id:'31', value : 'Sikkim' },
+        { id:'32', value : 'TamilNadu' },
+        { id:'33', value : 'Telangana' },
+        { id:'34', value : 'Tripura' },
+        { id:'35', value : 'Uttar Pradesh' },
+        { id:'36', value : 'Uttarakhand' },
+        { id:'37', value : 'West Bengal' }
+      ];
+    var map = new Map();
+    states.forEach((el)=>{
+        map.set(`${el.value}`,{'active':0,'recovered':0, 'deceased' : 0, 'id' : el.id});
+    })
+    
+    return map;
+}
