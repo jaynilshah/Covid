@@ -91,9 +91,10 @@ app.post('/updatePatient', authenticate, (req, res) => {
         })
 })
 //getPatientList
-app.get('/patientList', authenticate, (req, res) => {
+app.post('/patientList', authenticate, (req, res) => {
     var ans = [];
-    User.find().then((users) => {
+    var x = req.body.search;
+    User.find(x).then((users) => {
 
         users.forEach(element => {
             var temp = {
